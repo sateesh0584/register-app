@@ -4,7 +4,7 @@ pipeline {
         APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "sateesh0584"
-        DOCKER_PASS = "Dockerhub"
+        DOCKER_PASS = "Hari@107584@" // Make sure to escape or enclose the password properly
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Authenticate with Docker registry
-                    sh "echo ${DOCKER_PASS} | docker login --username ${DOCKER_USER} --password-Hari@107584@"
+                    sh "echo '${DOCKER_PASS}' | docker login --username ${DOCKER_USER} --password-stdin"
                     
                     // Build Docker image
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
