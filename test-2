@@ -14,10 +14,12 @@ pipeline {
                 script {
                     // Configure Docker credentials
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        // Build and push Docker image
-                        sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
-                        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        // Authenticate with Docker registry
+                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USER}", "${DOCKER_PASS}") {
+                            // Build and push Docker image
+                            def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                            dockerImage.push()
+                        }
                     }
                 }
             }
