@@ -1,30 +1,29 @@
-pipeline {
-    agent any 
-    environment {
-        APP_NAME = "register-app-pipeline"
-        RELEASE = "1.0.0"
-        DOCKER_USER = "sateesh0584"
-        DOCKER_PASS = "Hari@107584@" // Make sure to escape or enclose the password properly
-        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-    }
-    stages {
-        stage("Build & Push Docker Image") {
-            steps {
-                script {
-                    // Authenticate with Docker registry
-                    sh "echo '${DOCKER_PASS}' | docker login --username ${DOCKER_USER} --password-stdin"
-                    
-                    // Build Docker image
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                    
-                    // Tag Docker image
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
-                    
-                    // Push Docker image to registry
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker push ${IMAGE_NAME}:latest"
-                }
+environment {
+    APP_NAME = "register-app-pipeline"
+    RELEASE = "1.0.0"
+    DOCKER_USER = "sateesh0584"
+    DOCKER_PASS = credentials("docker") // Assuming "docker" is the ID of your Docker credentials in Jenkins
+    IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+    IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+}
+
+stage("Build & Push Docker Image") {
+    steps {
+        script {
+            // Debugging: Output environment variables for debugging
+            echo "APP_NAME: ${APP_NAME}"
+            echo "RELEASE: ${RELEASE}"
+            echo "DOCKER_USER: ${DOCKER_USER}"
+            echo "IMAGE_NAME: ${IMAGE_NAME}"
+            echo "IMAGE_TAG: ${IMAGE_TAG}"
+
+            // Debugging: Output Docker credentials for debugging
+            echo "DOCKER_PASS: ${DOCKER_PASS}"
+
+            docker.withRegistry('', DOCKER_PASS) {
+                def dockerImage = docker.build(IMAGE_NAME)
+                dockerImage.push(IMAGE_TAG)
+                dockerImage.push('latest')
             }
         }
     }
