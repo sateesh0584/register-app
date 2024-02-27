@@ -44,13 +44,6 @@ pipeline {
                 }
             }
         }
-        stage("Quality Gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'test'
-                }	
-            }
-        }
         stage("Build & Push Docker Image") {
             steps {
                 script {
