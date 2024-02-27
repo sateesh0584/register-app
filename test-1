@@ -44,15 +44,29 @@ pipeline {
             }
         }
 
+       stage("Quality Gate"){
+           steps {
+               script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'test'
+                }	
+            }
+
+        }
+
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('', "${DOCKER_PASS}") {
-                        def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                        dockerImage.push()
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
                     }
                 }
             }
-        }
+
+       }
     }
 }
