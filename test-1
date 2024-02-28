@@ -39,8 +39,8 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        sh "docker tag flask sateesh0584/myflask:latest"
-                        sh "docker push sateesh0584/myflask:latest"
+                        sh "docker build -t sateesh0584/myflask ."
+                        sh "docker push sateesh0584/myflask"
                     }
                 }
             }
