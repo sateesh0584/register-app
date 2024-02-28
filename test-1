@@ -44,15 +44,20 @@ pipeline {
                 }
             }
         }
-    stage("Docker Build & Push") {
+        stage("Build & Push Docker Image") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        sh "docker build -t sateesh0584/myflask ."
-                        sh "docker push sateesh0584/myflask"
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
                     }
                 }
             }
-        }
+
+       }
     }
 }
